@@ -119,7 +119,7 @@ namespace WindowsFormsApp1
                     //jika sebelumnya false maka tidak perlu cek posisi berikutnya
                     int nextX = x + gerak.X * j;
                     int nextY = y + gerak.Y * j;
-                    if (cekposisivalid(nextX, nextY, warna))
+                    if (cekposisivalid(nextX, nextY, warna, papan))
                     {
                         gerakan.Add(new Point(nextX, nextY));
                         int w = cekwarna(papan[nextX + nextY * 4]);
@@ -161,25 +161,22 @@ namespace WindowsFormsApp1
             return cek;
         }
 
-        public bool cekposisivalid(int x, int y, bool iswhite)
-        {
+        public bool cekposisivalid(int x, int y, int warna) => cekposisivalid(x, y, warna == WHITE);
+        public bool cekposisivalid(int x, int y, bool iswhite) => cekposisivalid(x, y, iswhite, isi);
+        public bool cekposisivalid(int x, int y, int warna, string papan) => cekposisivalid(x, y, warna == WHITE, papan);
+        public bool cekposisivalid(int x, int y, bool iswhite, string papan) {
             bool isvalid = true;
             int warna = iswhite ? WHITE : BLACK;
-            if (x < 0 || x > 3 || y < 0 || y > 7)
-            {
+            if (x < 0 || x > 3 || y < 0 || y > 7) {
                 //pengecekan posisi
                 isvalid = false;
-            }
-            else if (cekwarna(isi[y * 4 + x]) == warna)
-            {
+            } else if (cekwarna(papan[y * 4 + x]) == warna) {
                 //pengecekan warna
                 isvalid = false;
             }
-            
+
             return isvalid;
         }
-
-        public bool cekposisivalid(int x, int y, int warna) => cekposisivalid(x, y, warna == WHITE);
 
         public Point konversi(Point mouse)
         {
@@ -255,7 +252,7 @@ namespace WindowsFormsApp1
             if (possiblemove.Count > 0 )
             {
                 //get gerakan AI dari minimax
-                var keyValueSbe = minimax(isi,isWhite,5);
+                var keyValueSbe = minimax(isi,isWhite, 4);
                 int idx = keyValueSbe.Key;
                 move(possiblemove[idx].Key, possiblemove[idx].Value);
             }       
@@ -355,18 +352,23 @@ namespace WindowsFormsApp1
             
             if (ply == 0 || !papan.Contains('k') || !papan.Contains('K'))
             {
-                KeyValuePair<int, float> hasil = new KeyValuePair<int, float>(-1, sbe(papan));
+                float temp_sbe = sbe(papan);
+                KeyValuePair<int, float> hasil = new KeyValuePair<int, float>(-1, temp_sbe);
+                //System.Windows.Forms.MessageBox.Show(cetakPapan(papan) + "\n SBE: " + temp_sbe);
                 return hasil;
             }
             else
             {
                 float ret_sbe = activePlayer ? float.MinValue : float.MaxValue;
                 int idx_gerak = 0;
-                List<KeyValuePair<Point, Point>> allPossibleMove = getAllPossibleMoves(activePlayer,papan);
+                List<KeyValuePair<Point, Point>> allPossibleMove = getAllPossibleMoves(activePlayer, papan);
                 for (int i = 0; i < allPossibleMove.Count; i++)
                 {
                     var move = allPossibleMove[i];
-                    String newPapan = getNewPapan(papan, move.Key, move.Value);
+                    Point pSource = move.Key;
+                    Point pDest= move.Value;
+                    string newPapan = getNewPapan(papan, pSource, pDest);
+                    //System.Windows.Forms.MessageBox.Show(cetakPapan(papan) + "\n\n" + cetakPapan(newPapan) + "\n\n" + pSource + " " + pDest + "\n" + ( activePlayer ? "White" : "Black" ) + "\n" + ply);
                     var keyvaluesbe = minimax(newPapan, !activePlayer, ply - 1);
                     bool randomgeraksama = ret_sbe == keyvaluesbe.Value && random.Next(2) == 0;
                     if (activePlayer && (keyvaluesbe.Value > ret_sbe || randomgeraksama))
@@ -384,6 +386,19 @@ namespace WindowsFormsApp1
                 }
                 return new KeyValuePair<int, float>(idx_gerak, ret_sbe);
             }
+        }
+
+        string cetakPapan(string papan) {
+            var temp = "";
+            temp += papan.Substring(0, 4) + "\n";
+            temp += papan.Substring(4, 4) + "\n";
+            temp += papan.Substring(8, 4) + "\n";
+            temp += papan.Substring(12, 4) + "\n";
+            temp += papan.Substring(16, 4) + "\n";
+            temp += papan.Substring(20, 4) + "\n";
+            temp += papan.Substring(24, 4) + "\n";
+            temp += papan.Substring(28, 4) + "\n";
+            return temp;
         }
     }
 }

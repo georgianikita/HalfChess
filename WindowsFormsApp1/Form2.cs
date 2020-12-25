@@ -21,29 +21,25 @@ namespace WindowsFormsApp1
         {
             
             Form1 f = new Form1(Form1.MODE_PvP);
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             Form1 f = new Form1(Form1.MODE_ABvP);
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
             Form1 f = new Form1(Form1.MODE_AvA);
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
             Form1 f = new Form1(Form1.MODE_AWvP);
-            f.ShowDialog();
-            this.Close();
+            f.Show();
         }
     }
 }
