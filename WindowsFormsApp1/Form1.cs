@@ -66,17 +66,7 @@ namespace WindowsFormsApp1
                     papan.move(pionselected,p);
                     turn = !turn;
                     posisi.Clear();
-                    int winner = papan.getWinner();
-                    if(winner != Catur.SPACE)
-                    {
-                        MessageBox.Show("WINNER " + (winner == Catur.WHITE ? "WHITE !" : "BLACK !" ));
-                        fin = true;
-                    }
-                    else
-                    {
-                        triggerGerakAi();
-                        
-                    }
+                    checkGameEnded();
                 }
                 else
                 {
@@ -109,6 +99,8 @@ namespace WindowsFormsApp1
                 {
                     papan.gerakAI(turn);
                     turn = !turn;
+                    checkGameEnded();
+
                 }
 
             }
@@ -118,9 +110,23 @@ namespace WindowsFormsApp1
                 {
                     papan.gerakAI(turn);
                     turn = !turn;
+                    checkGameEnded();
                 }
             }
             
+        }
+        public void checkGameEnded()
+        {
+            int winner = papan.getWinner();
+            if (winner != Catur.SPACE)
+            {
+                MessageBox.Show("WINNER " + (winner == Catur.WHITE ? "WHITE !" : "BLACK !"));
+                fin = true;
+            }
+            else
+            {
+                triggerGerakAi();
+            }
         }
     }
 }

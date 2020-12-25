@@ -19,7 +19,7 @@ namespace WindowsFormsApp1
         {
             isi = "";
             isi += "rqkr";
-            isi += "hb*h";
+            isi += "hbbh";
             isi += "****";
             isi += "****";
             isi += "****";
@@ -35,7 +35,9 @@ namespace WindowsFormsApp1
 
         public string Isi { get => isi; set => isi = value; }
 
-        public List<Point> hint(int x, int y, bool turn )
+        public List<Point> hint(int x, int y, bool turn) => hint(x, y, turn, isi);
+
+        public List<Point> hint(int x,int y, bool turn, string papan)
         {
             //turn true = player 1 white
             //turn false = player 2 black
@@ -43,14 +45,14 @@ namespace WindowsFormsApp1
             List<Point> gerakbidak = new List<Point>(); //untuk gerakan tiap bidak
             int move = 0;
             //hint
-            int warna = turn ? WHITE : BLACK; 
-            char pion = isi[y * 4 + x];
+            int warna = turn ? WHITE : BLACK;
+            char pion = papan[y * 4 + x];
 
-            if(cekwarna(pion) != warna)
+            if (cekwarna(pion) != warna)
             {
 
             }
-            else if ( pion == 'k' || pion == 'K')
+            else if (pion == 'k' || pion == 'K')
             {
                 gerakbidak.Add(new Point(0, -1));  //atas
                 gerakbidak.Add(new Point(1, -1));  //kanan atas
@@ -65,14 +67,14 @@ namespace WindowsFormsApp1
             else if (pion == 'q' || pion == 'Q')
             {
                 //arah pergerakan queen
-                gerakbidak.Add(new Point(0,-1));  //atas
-                gerakbidak.Add(new Point(1,-1));  //kanan atas
+                gerakbidak.Add(new Point(0, -1));  //atas
+                gerakbidak.Add(new Point(1, -1));  //kanan atas
                 gerakbidak.Add(new Point(1, 0));  // kanan
                 gerakbidak.Add(new Point(1, 1));  //kanan bawah
                 gerakbidak.Add(new Point(0, 1));  //bawah
                 gerakbidak.Add(new Point(-1, 1)); //kiri bawah
                 gerakbidak.Add(new Point(-1, 0)); //kiri
-                gerakbidak.Add(new Point(-1,-1)); //kiri atas
+                gerakbidak.Add(new Point(-1, -1)); //kiri atas
                 move = 7;
             }
             else if (pion == 'b' || pion == 'B')
@@ -82,7 +84,7 @@ namespace WindowsFormsApp1
                 gerakbidak.Add(new Point(-1, 1));  // kanan
                 gerakbidak.Add(new Point(1, 1));  //kanan bawah
                 move = 3;
-                
+
             }
             else if (pion == 'h' || pion == 'H')
             {
@@ -119,7 +121,7 @@ namespace WindowsFormsApp1
                     if (cekposisivalid(nextX, nextY, warna))
                     {
                         gerakan.Add(new Point(nextX, nextY));
-                        int w = cekwarna(isi[nextX + nextY * 4]);
+                        int w = cekwarna(papan[nextX + nextY * 4]);
 
                         //masi bisa gerak ketika posisi selanjutnya spasi
                         if (w != SPACE)
@@ -133,7 +135,7 @@ namespace WindowsFormsApp1
                     }
                 }
             }
-            
+
             return gerakan;
         }
 
@@ -176,10 +178,7 @@ namespace WindowsFormsApp1
             return isvalid;
         }
 
-        public bool cekposisivalid(int x, int y, int warna)
-        {
-            return cekposisivalid(x,y,warna==WHITE);
-        }
+        public bool cekposisivalid(int x, int y, int warna) => cekposisivalid(x, y, warna == WHITE);
 
         public Point konversi(Point mouse)
         {
@@ -190,13 +189,17 @@ namespace WindowsFormsApp1
             return point;
         }
 
-        public void move(Point source, Point destination)
+        public void move(Point source, Point destination) => isi = getNewPapan(source, destination);
+
+        public string getNewPapan(Point source, Point destination) => getNewPapan(isi, source, destination);
+
+        public string getNewPapan(string papan,Point source,Point destination)
         {
-            //someString = someString.Remove(index, 1).Insert(index, "g");
             int idxdes = destination.Y * 4 + destination.X;
             int idxsrc = source.Y * 4 + source.X;
-            Isi = isi.Remove(idxdes, 1).Insert(idxdes, isi[idxsrc] + "");
-            Isi = isi.Remove(idxsrc, 1).Insert(idxsrc, "*");
+            papan = papan.Remove(idxdes, 1).Insert(idxdes, papan[idxsrc] + "");
+            papan = papan.Remove(idxsrc, 1).Insert(idxsrc, "*");
+            return papan;
         }
 
         public int getWinner()
@@ -212,11 +215,12 @@ namespace WindowsFormsApp1
             return SPACE;
         }
 
-        public void gerakAI(bool turn)
-        {
-            List<KeyValuePair<Point,Point>> possiblemove = new List<KeyValuePair<Point, Point>>();
+        public List<KeyValuePair<Point, Point>> getAllPossibleMoves(bool isWhite) => getAllPossibleMoves(isWhite, isi);
 
-            bool isWhite = turn;
+        public List<KeyValuePair<Point, Point>> getAllPossibleMoves(bool isWhite,string papan)
+        {
+            List<KeyValuePair<Point, Point>> possiblemove = new List<KeyValuePair<Point, Point>>();
+
             string bidakwhite = "KQHRB";
             string bidakblack = "kqhrb";
 
@@ -224,27 +228,36 @@ namespace WindowsFormsApp1
 
             for (int i = 0; i < bidakaktif.Length; i++)
             {
-                int idx = isi.IndexOf(bidakaktif[i], 0 );
-                
+                int idx = papan.IndexOf(bidakaktif[i], 0);
+
                 //while bidak masi ditemukan
                 while (idx != -1)
                 {
                     //System.Windows.Forms.MessageBox.Show(idx +" " + bidakaktif[i]);
                     Point source = new Point(idx % 4, idx / 4);
-                    List<Point> destinations = hint(source.X, source.Y, isWhite);
+                    List<Point> destinations = hint(source.X, source.Y, isWhite, papan);
 
                     foreach (Point item in destinations)
                     {
                         possiblemove.Add(new KeyValuePair<Point, Point>(source, item));
                     }
                     //possiblemove.Add(new Point(idx % 4, idx / 4));
-                    idx = isi.IndexOf(bidakaktif[i], idx + 1);
+                    idx = papan.IndexOf(bidakaktif[i], idx + 1);
                 }
             }
+            return possiblemove;
+        }
 
-            //random gerakan
-            int ctr = new Random().Next(possiblemove.Count);
-            move(possiblemove[ctr].Key, possiblemove[ctr].Value);
+        public void gerakAI(bool isWhite)
+        {
+            List<KeyValuePair<Point, Point>> possiblemove = getAllPossibleMoves(isWhite);
+            if (possiblemove.Count > 0 )
+            {
+                //get gerakan AI dari minimax
+                var keyValueSbe = minimax(isi,isWhite,5);
+                int idx = keyValueSbe.Key;
+                move(possiblemove[idx].Key, possiblemove[idx].Value);
+            }       
         }
 
         public void draw(Graphics g, List<Point> hint)
@@ -303,6 +316,71 @@ namespace WindowsFormsApp1
             {
                 Rectangle rect = new Rectangle((hint[i].X * 82) + 10, (hint[i].Y * 82) + 60, 80, 80);
                 g.FillRectangle(new SolidBrush(Color.FromArgb(127, Color.Yellow)), rect);
+            }
+        }
+
+        public float sbe(string papan)
+        {
+            float acc = 0;
+            Dictionary<char, int> valuePion = new Dictionary<char, int>();
+
+            //hitam
+            valuePion.Add('k', -100000);
+            valuePion.Add('q', -5000);
+            valuePion.Add('b', -1000);
+            valuePion.Add('h', -1000);
+            valuePion.Add('r', -3000);
+
+            //putih
+            valuePion.Add('K', 100000);
+            valuePion.Add('Q', 5000);
+            valuePion.Add('B', 1000);
+            valuePion.Add('H', 1000);
+            valuePion.Add('R', 3000);
+
+            for (int i = 0; i < papan.Length; i++)
+            {
+                if (valuePion.ContainsKey(papan[i]))
+                {
+                    acc += valuePion[papan[i]];
+                }
+            }
+
+            return acc;
+        }
+
+        public KeyValuePair<int, float> minimax(string papan, bool activePlayer, int ply)
+        {
+            
+            if (ply == 0)
+            {
+                KeyValuePair<int, float> hasil = new KeyValuePair<int, float>(-1, sbe(papan));
+                return hasil;
+            }
+            else
+            {
+                float ret_sbe = activePlayer ? float.MinValue : float.MaxValue;
+                int idx_gerak = 0;
+                List<KeyValuePair<Point, Point>> allPossibleMove = getAllPossibleMoves(activePlayer,papan);
+                for (int i = 0; i < allPossibleMove.Count; i++)
+                {
+                    var move = allPossibleMove[i];
+                    String newPapan = getNewPapan(papan, move.Key, move.Value);
+                    var keyvaluesbe = minimax(newPapan, !activePlayer, ply - 1);
+                    if (activePlayer && keyvaluesbe.Value > ret_sbe)
+                    {
+                        // Ambil MAX jika dia active player
+                        ret_sbe = keyvaluesbe.Value;
+                        idx_gerak = i;
+                    }
+                    else if (!activePlayer && keyvaluesbe.Value < ret_sbe)
+                    {
+                        // Ambil MIN jika dia !active player
+                        ret_sbe = keyvaluesbe.Value;
+                        idx_gerak = i;
+                    }
+                }
+                return new KeyValuePair<int, float>(idx_gerak, ret_sbe);
             }
         }
     }
