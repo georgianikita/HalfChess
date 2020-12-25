@@ -10,6 +10,7 @@ namespace WindowsFormsApp1
     class Catur
     {
         String isi;
+        Random random = new Random();
 
         public static int WHITE = 1;
         public static int BLACK = 0;
@@ -326,14 +327,14 @@ namespace WindowsFormsApp1
 
             //hitam
             valuePion.Add('k', -100000);
-            valuePion.Add('q', -5000);
+            valuePion.Add('q', -50000);
             valuePion.Add('b', -1000);
             valuePion.Add('h', -1000);
             valuePion.Add('r', -3000);
 
             //putih
             valuePion.Add('K', 100000);
-            valuePion.Add('Q', 5000);
+            valuePion.Add('Q', 50000);
             valuePion.Add('B', 1000);
             valuePion.Add('H', 1000);
             valuePion.Add('R', 3000);
@@ -352,7 +353,7 @@ namespace WindowsFormsApp1
         public KeyValuePair<int, float> minimax(string papan, bool activePlayer, int ply)
         {
             
-            if (ply == 0)
+            if (ply == 0 || !papan.Contains('k') || !papan.Contains('K'))
             {
                 KeyValuePair<int, float> hasil = new KeyValuePair<int, float>(-1, sbe(papan));
                 return hasil;
@@ -367,13 +368,14 @@ namespace WindowsFormsApp1
                     var move = allPossibleMove[i];
                     String newPapan = getNewPapan(papan, move.Key, move.Value);
                     var keyvaluesbe = minimax(newPapan, !activePlayer, ply - 1);
-                    if (activePlayer && keyvaluesbe.Value > ret_sbe)
+                    bool randomgeraksama = ret_sbe == keyvaluesbe.Value && random.Next(2) == 0;
+                    if (activePlayer && (keyvaluesbe.Value > ret_sbe || randomgeraksama))
                     {
                         // Ambil MAX jika dia active player
                         ret_sbe = keyvaluesbe.Value;
                         idx_gerak = i;
                     }
-                    else if (!activePlayer && keyvaluesbe.Value < ret_sbe)
+                    else if (!activePlayer && (keyvaluesbe.Value < ret_sbe || randomgeraksama))
                     {
                         // Ambil MIN jika dia !active player
                         ret_sbe = keyvaluesbe.Value;

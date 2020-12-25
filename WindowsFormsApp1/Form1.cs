@@ -23,6 +23,7 @@ namespace WindowsFormsApp1
         bool turn = true;
         char bidak;
         int mode;
+        int timer = 0;
 
         public Form1(int mode)
         {
@@ -93,26 +94,26 @@ namespace WindowsFormsApp1
         
         private void triggerGerakAi()
         {
-            if (turn)
-            {
-                if (mode == MODE_AWvP || mode == MODE_AvA)
+                if (turn)
                 {
-                    papan.gerakAI(turn);
-                    turn = !turn;
-                    checkGameEnded();
+                    if (mode == MODE_AWvP || mode == MODE_AvA)
+                    {
+                        papan.gerakAI(turn);
+                        turn = !turn;
+                        checkGameEnded();
+
+                    }
 
                 }
-
-            }
-            else
-            {
-                if (mode == MODE_ABvP || mode == MODE_AvA)
+                else
                 {
-                    papan.gerakAI(turn);
-                    turn = !turn;
-                    checkGameEnded();
+                    if (mode == MODE_ABvP || mode == MODE_AvA)
+                    {
+                        papan.gerakAI(turn);
+                        turn = !turn;
+                        checkGameEnded();
+                    }
                 }
-            }
             
         }
         public void checkGameEnded()
@@ -127,6 +128,10 @@ namespace WindowsFormsApp1
             {
                 triggerGerakAi();
             }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
         }
     }
 }
