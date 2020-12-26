@@ -20,6 +20,7 @@ namespace WindowsFormsApp1
         bool fin = false;
         List<Point> posisi = new List<Point>();
         Point pionselected ;
+        Point source = new Point(-2,-2);
         bool turn = true;
         char bidak;
         int mode;
@@ -38,7 +39,7 @@ namespace WindowsFormsApp1
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            papan.draw(e.Graphics, posisi);
+            papan.draw(e.Graphics, posisi, source );
         }
 
         private void Form1_Click(object sender, EventArgs e)
@@ -63,6 +64,7 @@ namespace WindowsFormsApp1
                 //jika yg diteken ada di list hint
                 if (posisi.Contains(p))
                 {
+                    source = pionselected;
                     //taruh pion ke posisi baru
                     papan.move(pionselected,p);
                     turn = !turn;
@@ -123,7 +125,7 @@ namespace WindowsFormsApp1
         void AiGerak()
         {
             // Proses Makan Waktu
-            papan.gerakAI(turn);
+            source = papan.gerakAI(turn);
             // ...
             // Jika sudah selesai maka...
             fin = false;

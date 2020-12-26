@@ -246,8 +246,9 @@ namespace WindowsFormsApp1
             return possiblemove;
         }
 
-        public void gerakAI(bool isWhite)
+        public Point gerakAI(bool isWhite)
         {
+            Point source = new Point(-1, -1);
             List<KeyValuePair<Point, Point>> possiblemove = getAllPossibleMoves(isWhite);
             if (possiblemove.Count > 0 )
             {
@@ -255,10 +256,13 @@ namespace WindowsFormsApp1
                 var keyValueSbe = minimax(isi,isWhite, 4);
                 int idx = keyValueSbe.Key;
                 move(possiblemove[idx].Key, possiblemove[idx].Value);
-            }       
+                 source = new Point(possiblemove[idx].Key.X, possiblemove[idx].Key.Y);
+                return source;
+            }
+            return source;
         }
 
-        public void draw(Graphics g, List<Point> hint)
+        public void draw(Graphics g, List<Point> hint, Point source)
         {
             //dictionary pion 
             // huruf besar = white (gerak pertama)
@@ -283,7 +287,17 @@ namespace WindowsFormsApp1
             dictionarypion.Add('H', Image.FromFile("p4.png"));
             dictionarypion.Add('R', Image.FromFile("p5.png"));
 
-            
+            //tampilan map atas 
+            g.DrawString("A", new Font("Arial", 20), new SolidBrush(Color.Black), 37, 30);
+            g.DrawString("B", new Font("Arial", 20), new SolidBrush(Color.Black), 117, 30);
+            g.DrawString("C", new Font("Arial", 20), new SolidBrush(Color.Black), 197, 30);
+            g.DrawString("D", new Font("Arial", 20), new SolidBrush(Color.Black), 277, 30);
+
+            //tampilan map kanan 
+            for (int i = 1; i <= 8; i++)
+            {
+                g.DrawString(i + "", new Font("Arial", 20), new SolidBrush(Color.Black), 340, 82 * i);
+            }
 
             for (int i = 0; i < 8; i++)
             {
@@ -315,6 +329,10 @@ namespace WindowsFormsApp1
                 Rectangle rect = new Rectangle((hint[i].X * 82) + 10, (hint[i].Y * 82) + 60, 80, 80);
                 g.FillRectangle(new SolidBrush(Color.FromArgb(127, Color.Yellow)), rect);
             }
+
+            //gambar source
+            Rectangle rect1 = new Rectangle((source.X * 82) + 10, (source.Y * 82) + 60, 80, 80);
+            g.FillRectangle(new SolidBrush(Color.FromArgb(127, Color.Red)), rect1);
         }
 
         public float sbe(string papan)
